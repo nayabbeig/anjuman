@@ -16,6 +16,21 @@ export const panchayatsApi = createApi({
           method: "get",
         }),
       }),
+      getPanchayatNames: builder.query({
+        query: ({ page = 1, pageSize = 25 } = {}) => ({
+          url: `?pagination[page]=${page}&pagination[pageSize]=${pageSize}`,
+          method: "get",
+        }),
+        transformResponse: (response) => {
+          return {
+            data: response?.data?.map(({ id, attributes }) => ({
+              id,
+              ...attributes,
+            })),
+            meta: response.meta,
+          };
+        },
+      }),
       createPanchayat: builder.mutation({
         query: (data) => {
           return { url: "/", method: "post", data };
@@ -37,6 +52,7 @@ export const panchayatsApi = createApi({
 
 export const {
   useGetPanchayatsQuery,
+  useGetPanchayatNamesQuery,
   useCreatePanchayatMutation,
   useUpdatePanchayatMutation,
   useDeletePanchayatMutation,

@@ -1,45 +1,96 @@
-import React from "react";
+import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
+import VotersForm from "./VotersForm";
+import DeleteVoterForm from "./deleteVoterModal";
+import { getIdNumber } from "../utils/utls";
 
-const VotersTableRow = ({ index, id, name, father, age, panchayat }) => {
+const VotersTableRow = ({
+  index,
+  id,
+  name,
+  father,
+  age,
+  panchayatName,
+  panchayatId,
+  address,
+  updatedAt,
+  setVoterToBeUpdated,
+  setVoterToBeDeleted,
+}) => {
   return (
     <Row>
       <Col className="border py-1 tableRow" md={1}>
         {index + 1}
       </Col>
-      <Col className="border py-1 tableRow" md={2}>
-        {id}
+      <Col className="border py-1 tableRow" md={1}>
+        {getIdNumber({ updatedAt, pid: panchayatId, id })}
       </Col>
-      <Col className="border py-1 tableRow" md={3}>
+      <Col className="border py-1 tableRow" md={2}>
         {name}
       </Col>
-      <Col className="border py-1 tableRow" md={3}>
+      <Col className="border py-1 tableRow" md={2}>
         {father}
       </Col>
       <Col className="border py-1 tableRow" md={1}>
         {age}
       </Col>
       <Col className="border py-1 tableRow" md={2}>
-        {panchayat}
+        {panchayatName}
+      </Col>
+      <Col className="border py-1 tableRow" md={2}>
+        {address}
+      </Col>
+
+      <Col className="border py-1 tableRow" md={1}>
+        <span
+          className="p-1"
+          onClick={() =>
+            setVoterToBeUpdated({
+              id,
+              name,
+              father,
+              age,
+              panchayat: panchayatId,
+            })
+          }
+        >
+          Edit
+        </span>
+        <span
+          className="p-1"
+          onClick={() =>
+            setVoterToBeDeleted({
+              id,
+              name,
+              father,
+              age,
+              panchayat: panchayatId,
+            })
+          }
+        >
+          Delete
+        </span>
       </Col>
     </Row>
   );
 };
 
 const VotersTable = ({ voters }) => {
+  const [voterToBeUpdated, setVoterToBeUpdated] = useState(null);
+  const [voterToBeDeleted, setVoterToBeDeleted] = useState(null);
   return (
     <div className="p-3">
       <Row>
         <Col className="border py-1 tableHeader" md={1}>
           Sn
         </Col>
-        <Col className="border py-1 tableHeader" md={2}>
+        <Col className="border py-1 tableHeader" md={1}>
           Id
         </Col>
-        <Col className="border py-1 tableHeader" md={3}>
+        <Col className="border py-1 tableHeader" md={2}>
           Name
         </Col>
-        <Col className="border py-1 tableHeader" md={3}>
+        <Col className="border py-1 tableHeader" md={2}>
           Father's Name
         </Col>
         <Col className="border py-1 tableHeader" md={1}>
@@ -48,10 +99,33 @@ const VotersTable = ({ voters }) => {
         <Col className="border py-1 tableHeader" md={2}>
           Panchayat
         </Col>
+        <Col className="border py-1 tableHeader" md={2}>
+          Address
+        </Col>
+        <Col className="border py-1 tableHeader" md={1}></Col>
       </Row>
       {voters.map((voter, index) => (
-        <VotersTableRow {...voter} index={index} />
+        <VotersTableRow
+          {...voter}
+          index={index}
+          setVoterToBeUpdated={setVoterToBeUpdated}
+          setVoterToBeDeleted={setVoterToBeDeleted}
+        />
       ))}
+
+      {voterToBeUpdated && (
+        <VotersForm
+          initialValues={voterToBeUpdated}
+          closeForm={() => setVoterToBeUpdated(null)}
+        />
+      )}
+
+      {voterToBeDeleted && (
+        <DeleteVoterForm
+          voter={voterToBeDeleted}
+          closeForm={() => setVoterToBeDeleted(null)}
+        />
+      )}
     </div>
   );
 };

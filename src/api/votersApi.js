@@ -23,12 +23,12 @@ export const votersApi = createApi({
       }),
       updateVoter: builder.mutation({
         query: (data) => {
-          return { url: `/${data._id}`, method: "put", data };
+          return { url: `/${data.id}`, method: "put", data };
         },
       }),
       deleteVoter: builder.mutation({
         query: (data) => {
-          return { url: `/${data._id}`, method: "delete" };
+          return { url: `/${data.id}`, method: "delete" };
         },
       }),
     };

@@ -1,13 +1,15 @@
-import React from "react";
-import { Container } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
 import NavBar from "../components/NavBar";
 import { useGetVotersQuery } from "../api/votersApi";
 import Loader from "../components/Loader";
 import VotersTable from "../components/VotersTable";
 import TablePagination from "../components/Pagination";
+import VotersForm, { Test } from "../components/VotersForm";
 
 const VotersPage = () => {
   const { data, isLoading } = useGetVotersQuery();
+  const [showVotersForm, setShowVotersForm] = useState(false);
 
   const { data: votersData, meta } = data || {};
   const voters = votersData?.map?.((voter, index) => ({
@@ -15,7 +17,10 @@ const VotersPage = () => {
     name: voter.attributes.name,
     father: voter.attributes.father,
     age: voter.attributes.age,
-    panchayat: voter.attributes?.panchayat?.data?.attributes?.name,
+    updatedAt: voter.attributes.updatedAt,
+    panchayatName: voter.attributes?.panchayat?.data?.attributes?.name,
+    panchayatId: voter.attributes?.panchayat?.data?.id,
+    address: voter.attributes.address,
   }));
 
   const pagination = meta?.pagination;
@@ -23,6 +28,15 @@ const VotersPage = () => {
   return (
     <Container fluid className="px-2">
       <NavBar />
+      {/* <Test /> */}
+      <Row className="mt-2">
+        <Col>
+          <h2>Voters</h2>
+        </Col>
+        <Col className="d-flex justify-content-end">
+          <Button onClick={() => setShowVotersForm(true)}>Add Voter</Button>
+        </Col>
+      </Row>
       {isLoading && <Loader />}
       {voters && (
         <>
@@ -34,6 +48,10 @@ const VotersPage = () => {
             />
           )}
         </>
+      )}
+
+      {showVotersForm && (
+        <VotersForm closeForm={() => setShowVotersForm(false)} />
       )}
     </Container>
   );
