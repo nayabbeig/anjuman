@@ -8,7 +8,8 @@ import TablePagination from "../components/Pagination";
 import VotersForm, { Test } from "../components/VotersForm";
 
 const VotersPage = () => {
-  const { data, isLoading } = useGetVotersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading } = useGetVotersQuery({ page: currentPage });
   const [showVotersForm, setShowVotersForm] = useState(false);
 
   const { data: votersData, meta } = data || {};
@@ -33,22 +34,21 @@ const VotersPage = () => {
         <Col>
           <h2>Voters</h2>
         </Col>
+        <Col>
+          {pagination && voters && (
+            <TablePagination
+              totalPages={pagination.pageCount}
+              currentPage={pagination.page}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+        </Col>
         <Col className="d-flex justify-content-end">
           <Button onClick={() => setShowVotersForm(true)}>Add Voter</Button>
         </Col>
       </Row>
       {isLoading && <Loader />}
-      {voters && (
-        <>
-          <VotersTable voters={voters} />
-          {pagination && (
-            <TablePagination
-              totalPages={pagination.pageCount}
-              currentPage={pagination.page}
-            />
-          )}
-        </>
-      )}
+      {voters && <VotersTable voters={voters} />}
 
       {showVotersForm && (
         <VotersForm closeForm={() => setShowVotersForm(false)} />

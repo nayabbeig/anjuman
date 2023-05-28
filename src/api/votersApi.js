@@ -11,7 +11,7 @@ export const votersApi = createApi({
   endpoints(builder) {
     return {
       getVoters: builder.query({
-        query: ({ page = 1, pageSize = 25 } = {}) => ({
+        query: ({ page = 1, pageSize = 15 } = {}) => ({
           url: `?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
           method: "get",
         }),
