@@ -6,7 +6,7 @@ function NavBar() {
   const history = useHistory();
   const { panchayats, voters } = path.ui;
   return (
-    <Nav variant="tabs">
+    <Nav className="no-print" variant="tabs">
       <Nav.Item>
         <Nav.Link
           onClick={() => history.push(voters)}

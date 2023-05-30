@@ -17,10 +17,15 @@ export const votersApi = createApi({
         }),
       }),
       getVotersByPanchayat: builder.query({
-        query: ({ page = 1, pageSize = 15, panchayat } = {}) => {
+        query: ({ page = 1, pageSize = 15, panchayat, name, uid } = {}) => {
+          console.log(name, uid);
           return (
             panchayat && {
-              url: `?filters[panchayat]=${panchayat}&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
+              url: `?filters[panchayat]=${panchayat}${
+                name ? `&filters[$or][0][name][$contains]=${name}` : ""
+              }${
+                uid ? `&filters[$or][1][uid][$contains]=${uid}` : ""
+              }&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
               method: "get",
             }
           );

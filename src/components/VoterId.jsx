@@ -47,6 +47,10 @@ const VoterId = ({ voter }) => {
           <Col>{voter.name}</Col>
         </Row>
         <Row>
+          <Col xs={5}>uid: </Col>
+          <Col>{voter.uid}</Col>
+        </Row>
+        <Row>
           <Col xs={5}>Father's Name: </Col>
           <Col>{voter.father}</Col>
         </Row>

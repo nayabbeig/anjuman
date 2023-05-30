@@ -7,7 +7,7 @@ a{
 }
 
 @media print { 
-  .no-print  { display: none;}
+  .no-print  { display: none !important;}
   .print  { display: block;}
 
   body{

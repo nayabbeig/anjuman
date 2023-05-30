@@ -6,10 +6,9 @@ import Loader from "../components/Loader";
 import VotersTable from "../components/VotersTable";
 import TablePagination from "../components/Pagination";
 import VotersForm, { Test } from "../components/VotersForm";
-import ScanAdhar, { closeCamera, useScanner } from "../components/ScanAdhar";
+import ScanAdhar, { QRScanner, closeCamera } from "../components/ScanAdhar";
 
 const VotersPage = () => {
-  const [QRScanner, CameraSelector] = useScanner();
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch, isFetching, ...rest } = useGetVotersQuery({
     page: currentPage,
@@ -111,7 +110,6 @@ const VotersPage = () => {
           openScanner={() => setShowScanner(true)}
           closeScanner={closeScanner}
           isScannerOpen={showScanner}
-          renderCameraSelector={() => <CameraSelector />}
         />
       )}
 
@@ -122,7 +120,7 @@ const VotersPage = () => {
             right: "10px",
             bottom: "300px",
             zIndex: 10000,
-            width: "250px",
+            width: "280px",
             padding: "10px",
             background: "white",
           }}
@@ -132,7 +130,7 @@ const VotersPage = () => {
             setShowScanner={setShowScanner}
             setData={handleAdharData}
           /> */}
-          <QRScanner setData={handleAdharData} />
+          <QRScanner closeScanner={closeScanner} setData={handleAdharData} />
         </div>
       )}
     </Container>
