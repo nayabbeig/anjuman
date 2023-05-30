@@ -5,3 +5,13 @@ a{
 .tableHeader{
   font-weight: 550;
 }
+
+@media print { 
+  .no-print  { display: none;}
+  .print  { display: block;}
+
+  body{
+    zoom: 65%;
+  }
+
+}

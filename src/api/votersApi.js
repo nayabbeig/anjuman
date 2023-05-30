@@ -16,6 +16,16 @@ export const votersApi = createApi({
           method: "get",
         }),
       }),
+      getVotersByPanchayat: builder.query({
+        query: ({ page = 1, pageSize = 15, panchayat } = {}) => {
+          return (
+            panchayat && {
+              url: `?filters[panchayat]=${panchayat}&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
+              method: "get",
+            }
+          );
+        },
+      }),
       createVoter: builder.mutation({
         query: (data) => {
           return { url: "/", method: "post", data };
@@ -37,6 +47,7 @@ export const votersApi = createApi({
 
 export const {
   useGetVotersQuery,
+  useGetVotersByPanchayatQuery,
   useCreateVoterMutation,
   useUpdateVoterMutation,
   useDeleteVoterMutation,

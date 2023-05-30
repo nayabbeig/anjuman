@@ -1,7 +1,6 @@
 import Pagination from "react-bootstrap/Pagination";
 
 function TablePagination({ totalPages, currentPage, setCurrentPage }) {
-  console.log("totlaPage", totalPages, "currentPage", currentPage);
   return (
     <>
       {currentPage > 6 && !(currentPage > totalPages - 6) && (

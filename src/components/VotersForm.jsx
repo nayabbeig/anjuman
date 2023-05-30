@@ -10,66 +10,63 @@ import {
   useUpdateVoterMutation,
 } from "../api/votersApi";
 import QRGenerator from "./QRGenerator";
-import electionInchargeSignature from "../assets/images/signature.png";
 import moment from "moment";
 import { getIdNumber } from "../utils/utls";
+import VoterId from "./VoterId";
+import { BsQrCodeScan } from "react-icons/bs";
+import ScanAdhar from "./ScanAdhar";
 
-export const Test = (props) => {
-  const [data, setData] = useState("No result");
-
-  return (
-    <>
-      <QrReader
-        onResult={(result, error) => {
-          if (!!result) {
-            setData(result?.text);
-            alert(result?.text);
-          }
-
-          if (!!error) {
-            console.info(error);
-          }
-        }}
-        style={{ width: "100%", border: "5px solid black" }}
-      />
-      <p>{data}</p>
-    </>
-  );
-};
-
-const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
+const VotersForm = ({
+  closeForm,
+  initialValuesJson,
+  deleteForm,
+  refetch,
+  isFetching,
+  openScanner,
+  closeScanner,
+  isScannerOpen,
+  renderCameraSelector,
+}) => {
   const { data, isLoading } = useGetPanchayatNamesQuery();
+  const initialValues = initialValuesJson && JSON.parse(initialValuesJson);
   const panchayats = data?.data;
-  const [createVoter, createResults] = useCreateVoterMutation();
+  const [createVoter, createResults, ...rest] = useCreateVoterMutation();
   const [updateVoter, updateResults] = useUpdateVoterMutation();
   const [showForm, setShowForm] = useState(true);
   const [lastSubmittedData, setLastSubmittedData] = useState(null);
-  console.log("createResults", createResults);
   useEffect(() => {
-    if (createResults.isSuccess || updateResults.isSuccess) setShowForm(false);
+    if (createResults.isSuccess || updateResults.isSuccess) {
+      setShowForm(false);
+      refetch();
+    }
   }, [createResults.isSuccess, updateResults.isSuccess]);
   //   console.log(panchayats);
-  const handleClose = () => closeForm();
+
+  const handleClose = () => {
+    closeForm();
+    closeScanner?.();
+  };
 
   const modalTitle = "Add New Voter";
-
-  const getFormattedDate = (dateString) =>
-    moment(new Date(dateString)).format("DD-MMM-YYYY hh:mm A");
 
   //   console.log(panchayat);
 
   const onSubmit = async (values) => {
-    const res = initialValues
-      ? await updateVoter({ data: { ...values }, id: initialValues.id })
-      : await createVoter({ data: values });
-    console.log("result after submit", res);
-    console.log("voter data", {
-      ...res.data.data,
-      attributes: {
-        ...res.data.data.attributes,
-        panchayat: values.panchayat,
-      },
-    });
+    const res =
+      initialValues && !openScanner
+        ? await updateVoter({ data: { ...values }, id: initialValues.id })
+        : await createVoter({ data: values });
+
+    if (res?.error) {
+      const errors = res.error?.response?.data?.error?.details?.errors;
+      if (errors?.length) {
+        const errorObject = {};
+        errors.map((err) => {
+          errorObject[err.path[0]] = err.message;
+        });
+        return errorObject;
+      }
+    }
     if (res.data.data)
       setLastSubmittedData({
         panchayat: values.panchayat,
@@ -83,6 +80,9 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
     const errors = {};
     if (!values.name) {
       errors.name = "Required";
+    }
+    if (!values.uid) {
+      errors.uid = "Required";
     }
     if (!values.father) {
       errors.father = "Required";
@@ -103,12 +103,26 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
     return errors;
   };
 
-  console.log("last submitted data", lastSubmittedData);
   return (
     <>
-      <Modal show={true} onHide={handleClose} backdrop="static" size="xl">
+      <Modal show={true} onHide={handleClose} backdrop="static" size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
+          {openScanner && (
+            <>
+              <Button
+                className="mx-3"
+                onClick={() => {
+                  if (isScannerOpen) {
+                    return closeScanner();
+                  }
+                  return openScanner();
+                }}
+              >
+                <BsQrCodeScan size={30} />
+              </Button>
+            </>
+          )}
           {createResults.isSuccess && (
             <Alert className="m-0 mx-2 p-1 px-2" variant="success">
               Voter has been created!
@@ -129,6 +143,7 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
               dirty,
               values,
               errors,
+              submitErrors,
               submitFailed,
               ...others
             }) => {
@@ -138,71 +153,116 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
                   <Modal.Body>
                     {/* {console.log("others", others)} */}
                     <Row>
-                      <Col md={8}>
+                      <Col>
                         <Form onSubmit={handleSubmit}>
-                          <Field
-                            name="name"
-                            validate={(value) => !value && "Required"}
-                          >
-                            {({ input, meta }) => (
-                              <Form.Group className="mb-3" controlId="name">
-                                <Form.Label>Name</Form.Label>
-                                <Form.Control
-                                  {...input}
-                                  type="text"
-                                  placeholder="Enter name"
-                                  isInvalid={
-                                    (meta.dirty || submitFailed) && meta.error
-                                  }
-                                  isValid={meta.dirty && !meta.error}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                  {meta.error}
-                                </Form.Control.Feedback>
-                              </Form.Group>
-                            )}
-                          </Field>
-
-                          <Field name="father">
-                            {({ input, meta }) => (
-                              <Form.Group className="mb-3" controlId="father">
-                                <Form.Label>Father's Name</Form.Label>
-                                <Form.Control
-                                  {...input}
-                                  type="text"
-                                  placeholder="Enter Father's Name"
-                                  isInvalid={
-                                    (meta.dirty || submitFailed) && meta.error
-                                  }
-                                  isValid={meta.dirty && !meta.error}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                  {meta.error}
-                                </Form.Control.Feedback>
-                              </Form.Group>
-                            )}
-                          </Field>
-
-                          <Field name="age">
-                            {({ input, meta }) => (
-                              <Form.Group className="mb-3" controlId="age">
-                                <Form.Label>Age</Form.Label>
-                                <Form.Control
-                                  {...input}
-                                  type="number"
-                                  placeholder="Enter Age"
-                                  isInvalid={
-                                    (meta.dirty || submitFailed) && meta.error
-                                  }
-                                  isValid={meta.dirty && !meta.error}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                  {meta.error}
-                                </Form.Control.Feedback>
-                              </Form.Group>
-                            )}
-                          </Field>
-
+                          <Row>
+                            <Col>
+                              <Field
+                                name="name"
+                                validate={(value) => !value && "Required"}
+                              >
+                                {({ input, meta }) => (
+                                  <Form.Group className="mb-3" controlId="name">
+                                    <Form.Label>Name</Form.Label>
+                                    <Form.Control
+                                      {...input}
+                                      type="text"
+                                      placeholder="Enter name"
+                                      isInvalid={
+                                        (meta.dirty || submitFailed) &&
+                                        meta.error
+                                      }
+                                      isValid={meta.dirty && !meta.error}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                      {meta.error}
+                                    </Form.Control.Feedback>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                            <Col>
+                              <Field
+                                name="uid"
+                                validate={(value) => !value && "Required"}
+                              >
+                                {({ input, meta }) => (
+                                  <Form.Group className="mb-3" controlId="uid">
+                                    <Form.Label>UID</Form.Label>
+                                    <Form.Control
+                                      {...input}
+                                      type="text"
+                                      placeholder="Enter Aadhaar No."
+                                      isInvalid={
+                                        ((meta.dirty || submitFailed) &&
+                                          meta.error) ||
+                                        submitErrors?.uid
+                                      }
+                                      isValid={
+                                        meta.dirty &&
+                                        !meta.error &&
+                                        !submitErrors?.uid
+                                      }
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                      {meta.error ||
+                                        submitErrors?.uid +
+                                          ". This UID is already in use"}
+                                    </Form.Control.Feedback>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col>
+                              <Field name="father">
+                                {({ input, meta }) => (
+                                  <Form.Group
+                                    className="mb-3"
+                                    controlId="father"
+                                  >
+                                    <Form.Label>Father's Name</Form.Label>
+                                    <Form.Control
+                                      {...input}
+                                      type="text"
+                                      placeholder="Enter Father's Name"
+                                      isInvalid={
+                                        (meta.dirty || submitFailed) &&
+                                        meta.error
+                                      }
+                                      isValid={meta.dirty && !meta.error}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                      {meta.error}
+                                    </Form.Control.Feedback>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                            <Col>
+                              <Field name="age">
+                                {({ input, meta }) => (
+                                  <Form.Group className="mb-3" controlId="age">
+                                    <Form.Label>Age</Form.Label>
+                                    <Form.Control
+                                      {...input}
+                                      type="number"
+                                      placeholder="Enter Age"
+                                      isInvalid={
+                                        (meta.dirty || submitFailed) &&
+                                        meta.error
+                                      }
+                                      isValid={meta.dirty && !meta.error}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                      {meta.error}
+                                    </Form.Control.Feedback>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                          </Row>
                           <Field name="panchayat">
                             {({ input, meta }) => (
                               <Form.Group
@@ -262,39 +322,6 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
                           </Field>
                         </Form>
                       </Col>
-                      <Col className="border rounded-2 py-2">
-                        <Row>
-                          <Col>
-                            <h6>Preview</h6>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col md={5}>Name: </Col>
-                          <Col>{values.name}</Col>
-                        </Row>
-                        <Row>
-                          <Col md={5}>Father's Name: </Col>
-                          <Col>{values.father}</Col>
-                        </Row>
-                        <Row>
-                          <Col md={5}>Age: </Col>
-                          <Col>{values.age}</Col>
-                        </Row>
-                        <Row>
-                          <Col md={5}>Panchayat: </Col>
-                          <Col>
-                            {values.panchayat ? `[${values.panchayat}]` : ""}{" "}
-                            {
-                              panchayats?.find((p) => p.id === values.panchayat)
-                                ?.name
-                            }
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col md={5}>Address: </Col>
-                          <Col>{values.address}</Col>
-                        </Row>
-                      </Col>
                     </Row>
                   </Modal.Body>
                   {
@@ -336,84 +363,7 @@ const VotersForm = ({ closeForm, initialValues, deleteForm }) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col md={4} className="border rounded-2 py-2">
-                    <Row className="m-3">
-                      <Col className="text-center">
-                        <h6>Anjuman Islamia Election Committee</h6>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col>
-                        <div
-                          style={{ width: "100px", height: "120px" }}
-                          className="border d-flex justify-content-center align-items-center"
-                        >
-                          Photo
-                        </div>
-                      </Col>
-                      <Col>
-                        <QRGenerator
-                          value={JSON.stringify({
-                            ...lastSubmittedData,
-                            IDN: getIdNumber(lastSubmittedData),
-                          })}
-                        />
-                        <h6 className="my-2">
-                          {getIdNumber(lastSubmittedData)}
-                        </h6>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md={5}>Name: </Col>
-                      <Col>{lastSubmittedData.name}</Col>
-                    </Row>
-                    <Row>
-                      <Col md={5}>Father's Name: </Col>
-                      <Col>{lastSubmittedData.father}</Col>
-                    </Row>
-                    <Row>
-                      <Col md={5}>Age: </Col>
-                      <Col>{lastSubmittedData.age}</Col>
-                    </Row>
-                    <Row>
-                      <Col md={5}>Panchayat: </Col>
-                      <Col>
-                        {lastSubmittedData.panchayat
-                          ? `[${lastSubmittedData.panchayat}]`
-                          : ""}{" "}
-                        {
-                          panchayats?.find(
-                            (p) =>
-                              String(p.id) ===
-                              String(lastSubmittedData.panchayat)
-                          )?.name
-                        }
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md={5}>Address: </Col>
-                      <Col>{lastSubmittedData.address || "N/A"}</Col>
-                    </Row>
-
-                    <Row>
-                      <Col md={5}>Issued On: </Col>
-                      <Col>
-                        {lastSubmittedData?.updatedAt &&
-                          getFormattedDate(lastSubmittedData.updatedAt)}
-                      </Col>
-                    </Row>
-
-                    <Row className="my-3">
-                      <Col className="">Election Incharge:</Col>
-                      <Col>
-                        <img
-                          src={electionInchargeSignature}
-                          width="100px"
-                          alt="sign"
-                        />
-                      </Col>
-                    </Row>
-                  </Col>
+                  <VoterId voter={lastSubmittedData} />
                 </Row>
               </Container>
             </Modal.Body>

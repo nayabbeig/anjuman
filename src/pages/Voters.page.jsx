@@ -6,10 +6,14 @@ import Loader from "../components/Loader";
 import VotersTable from "../components/VotersTable";
 import TablePagination from "../components/Pagination";
 import VotersForm, { Test } from "../components/VotersForm";
+import ScanAdhar, { closeCamera, useScanner } from "../components/ScanAdhar";
 
 const VotersPage = () => {
+  const [QRScanner, CameraSelector] = useScanner();
   const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading } = useGetVotersQuery({ page: currentPage });
+  const { data, isLoading, refetch, isFetching, ...rest } = useGetVotersQuery({
+    page: currentPage,
+  });
   const [showVotersForm, setShowVotersForm] = useState(false);
 
   const { data: votersData, meta } = data || {};
@@ -25,6 +29,46 @@ const VotersPage = () => {
   }));
 
   const pagination = meta?.pagination;
+
+  const [showScanner, setShowScanner] = useState(false);
+  const [adharData, setAdharData] = useState();
+
+  const getAgeFromYob = (yob) =>
+    new Date().getFullYear() - new Date(yob).getFullYear();
+
+  const closeScanner = () => {
+    closeCamera();
+    setShowScanner(false);
+  };
+
+  const handleAdharData = (data) => {
+    if (!data) return;
+    console.log("scan data from handler", data);
+    const adharObject = JSON.parse(data);
+    const {
+      uid,
+      name,
+      gender,
+      yob,
+      co: father,
+      loc: address,
+      vtc,
+      po,
+      dist,
+      state,
+      pc: pincode,
+    } = adharObject;
+
+    const voter = {
+      name,
+      uid,
+      father,
+      age: getAgeFromYob(yob),
+      address,
+    };
+
+    setAdharData(JSON.stringify(voter));
+  };
 
   return (
     <Container fluid className="px-2">
@@ -48,10 +92,48 @@ const VotersPage = () => {
         </Col>
       </Row>
       {isLoading && <Loader />}
-      {voters && <VotersTable voters={voters} />}
+      {voters && (
+        <VotersTable
+          voters={voters}
+          refetch={refetch}
+          isFetching={isFetching}
+          currentPage={currentPage}
+          pageSize={meta?.pagination?.pageSize}
+        />
+      )}
 
       {showVotersForm && (
-        <VotersForm closeForm={() => setShowVotersForm(false)} />
+        <VotersForm
+          refetch={refetch}
+          initialValuesJson={adharData}
+          isFetching={isFetching}
+          closeForm={() => setShowVotersForm(false)}
+          openScanner={() => setShowScanner(true)}
+          closeScanner={closeScanner}
+          isScannerOpen={showScanner}
+          renderCameraSelector={() => <CameraSelector />}
+        />
+      )}
+
+      {showScanner && (
+        <div
+          style={{
+            position: "fixed",
+            right: "10px",
+            bottom: "300px",
+            zIndex: 10000,
+            width: "250px",
+            padding: "10px",
+            background: "white",
+          }}
+        >
+          {/* <ScanAdhar
+            showScanner={showScanner}
+            setShowScanner={setShowScanner}
+            setData={handleAdharData}
+          /> */}
+          <QRScanner setData={handleAdharData} />
+        </div>
       )}
     </Container>
   );

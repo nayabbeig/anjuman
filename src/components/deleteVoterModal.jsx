@@ -6,7 +6,7 @@ import { Alert, Col, Container, Row, Spinner } from "react-bootstrap";
 import { useGetPanchayatNamesQuery } from "../api/panchayatsApi";
 
 function DeleteVoterForm({ closeForm, voter }) {
-  const { refetch, isRefetching } = useGetVotersQuery();
+  const { refetch, isFetching } = useGetVotersQuery();
   const { data, isLoading: isPanchayatLoading } = useGetPanchayatNamesQuery();
   const panchayats = data?.data;
   const [deleteVoter, result] = useDeleteVoterMutation();
@@ -18,7 +18,6 @@ function DeleteVoterForm({ closeForm, voter }) {
   return (
     <>
       <Modal show={true} onHide={closeForm}>
-        {console.log("result", result)}
         <Modal.Header closeButton>
           <Modal.Title>Do you really want to delete?</Modal.Title>
         </Modal.Header>

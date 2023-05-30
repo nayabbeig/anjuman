@@ -2,24 +2,25 @@ import { QRCodeSVG } from "qrcode.react";
 
 import MoonStar from "../assets/images/MoonStar.png";
 
-const QRGenerator = ({ value }) => {
-  console.log("qr value", value);
+const QRGenerator = ({ value, size, imageSize, noImage }) => {
   return (
     <QRCodeSVG
       value={value}
-      size={100}
+      size={size || 100}
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"L"}
       includeMargin={false}
-      imageSettings={{
-        src: MoonStar,
-        x: undefined,
-        y: undefined,
-        height: 24,
-        width: 24,
-        excavate: true,
-      }}
+      imageSettings={
+        !noImage && {
+          src: MoonStar,
+          x: undefined,
+          y: undefined,
+          height: imageSize || 24,
+          width: imageSize || 24,
+          excavate: true,
+        }
+      }
     />
   );
 };
