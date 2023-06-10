@@ -58,11 +58,8 @@ const VotersPage = () => {
   //   return () => window.addEventListener("keypress", handleKeyPress);
   // }, []);
 
-  console.log("audio", new Audio(onScanError));
-
   const handleAdharData = (data) => {
     if (!data) return;
-    console.log("scan data from handler", data);
     if (data === "{}") {
       const errorAudio = new Audio(onScanError);
       errorAudio.play();

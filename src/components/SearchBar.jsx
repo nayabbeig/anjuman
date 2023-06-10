@@ -14,7 +14,6 @@ const SearchBar = ({
   const searchBarRef = useRef(null);
   const handleSearch = () => {
     const keyword = searchBarRef?.current?.value;
-    console.log("keyword from button", keyword);
     setCurrentPage(1);
     setKeyword(keyword);
   };

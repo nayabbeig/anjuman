@@ -11,7 +11,6 @@ class Html5QrcodePlugin extends React.Component {
     this.props = props;
   }
   render() {
-    console.log("this");
     return <div id={qrcodeRegionId} />;
   }
 

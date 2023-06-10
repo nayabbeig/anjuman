@@ -98,6 +98,7 @@ const VotersTable = ({
   pageSize,
   refetch,
   isFetching,
+  panchayat,
   zoom,
   type,
 }) => {
@@ -155,6 +156,7 @@ const VotersTable = ({
           initialValuesJson={JSON.stringify(voterToBeUpdated)}
           refetch={refetch}
           isFetching={isFetching}
+          panchayat={panchayat}
           closeForm={() => setVoterToBeUpdated(null)}
         />
       )}

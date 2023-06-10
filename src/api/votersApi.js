@@ -18,7 +18,6 @@ export const votersApi = createApi({
       }),
       getVotersByPanchayat: builder.query({
         query: ({ page = 1, pageSize = 15, panchayat, name, uid } = {}) => {
-          console.log(name, uid);
           return (
             panchayat && {
               url: `?filters[panchayat]=${panchayat}${

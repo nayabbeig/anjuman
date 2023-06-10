@@ -9,10 +9,15 @@ import VoterId from "../components/VoterId";
 import SearchBar from "../components/SearchBar";
 import { useLayoutEffect } from "react";
 import VotersTable from "../components/VotersTable";
+import VotersForm from "../components/VotersForm";
+import { QRScanner, closeCamera } from "../components/ScanAdhar";
+import onScanSuccess from "../assets/audio/onScanSuccess.mp3";
+import onScanError from "../assets/audio/onScanError.mp3";
 
 const PanchayatsPage = () => {
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showVotersForm, setShowVotersForm] = useState(false);
   const { data, isLoading } = useGetPanchayatsQuery();
   const { data: panchayatsData } = data || {};
 
@@ -88,6 +93,66 @@ const PanchayatsPage = () => {
 
   const shouldLoaderDisplay = isLoading || isVotersLoading || isVotersFetching;
 
+  const [showScanner, setShowScanner] = useState(false);
+  const [adharData, setAdharData] = useState();
+
+  const getAgeFromYob = (yob) =>
+    new Date().getFullYear() - new Date(yob).getFullYear();
+
+  const closeScanner = () => {
+    closeCamera();
+    setShowScanner(false);
+  };
+
+  const openScanner = () => {
+    setShowScanner(true);
+  };
+
+  // useEffect(() => {
+  //   const handleKeyPress = (e) => {
+  //     if (e.key === "s") openScanner();
+  //   };
+  //   window.addEventListener("keypress", handleKeyPress);
+
+  //   return () => window.addEventListener("keypress", handleKeyPress);
+  // }, []);
+
+  const handleAdharData = (data) => {
+    if (!data) return;
+    if (data === "{}") {
+      const errorAudio = new Audio(onScanError);
+      errorAudio.play();
+    } else {
+      const audioSuccess = new Audio(onScanSuccess);
+      audioSuccess.play();
+      closeScanner();
+    }
+    const adharObject = JSON.parse(data);
+    const {
+      uid,
+      name,
+      gender,
+      yob,
+      co: father,
+      loc: address,
+      vtc,
+      po,
+      dist,
+      state,
+      pc: pincode,
+    } = adharObject;
+
+    const voter = {
+      name,
+      uid,
+      father,
+      age: getAgeFromYob(yob),
+      address,
+    };
+
+    setAdharData(JSON.stringify(voter));
+  };
+
   return (
     <Container fluid className="px-2">
       <Row className="no-print">
@@ -108,7 +173,7 @@ const PanchayatsPage = () => {
                 />
               )}
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <SearchBar
                 setKeyword={setKeyword}
                 keyword={keyword}
@@ -117,12 +182,15 @@ const PanchayatsPage = () => {
                 useWrappedQuery={useWrappedQuery}
               />
             </Col>
-            <Col md={2}>
+            <Col className="d-flex justify-content-end">
+              <Button onClick={() => setShowVotersForm(true)}>Add Voter</Button>
+            </Col>
+            <Col md={1} className="d-flex justify-content-end">
               {votersListFormatted && (
                 <Button
                   onClick={() => window.print()}
                   variant="success"
-                  className="px-3 mx-5"
+                  className="px-3"
                 >
                   Print
                 </Button>
@@ -158,9 +226,45 @@ const PanchayatsPage = () => {
           isFetching={isVotersFetching}
           currentPage={currentPage}
           pageSize={meta?.pagination?.pageSize}
+          panchayat={selectedPanchayat}
           type="panchayat"
-          zoom="70%"
+          zoom="80%"
         />
+      )}
+
+      {showVotersForm && (
+        <VotersForm
+          refetch={refetch}
+          initialValuesJson={adharData}
+          isFetching={isVotersFetching}
+          closeForm={() => setShowVotersForm(false)}
+          openScanner={openScanner}
+          closeScanner={closeScanner}
+          isScannerOpen={showScanner}
+          panchayat={selectedPanchayat}
+        />
+      )}
+
+      {showScanner && (
+        <div
+          style={{
+            position: "fixed",
+            top: "100",
+            right: "10px",
+            bottom: "300px",
+            zIndex: 10000,
+            width: "280px",
+            padding: "10px",
+            background: "white",
+          }}
+        >
+          {/* <ScanAdhar
+            showScanner={showScanner}
+            setShowScanner={setShowScanner}
+            setData={handleAdharData}
+          /> */}
+          <QRScanner closeScanner={closeScanner} setData={handleAdharData} />
+        </div>
       )}
     </Container>
   );

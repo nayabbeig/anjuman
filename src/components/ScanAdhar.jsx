@@ -21,7 +21,6 @@ const CameraSelector = ({ setSelectedCamera, selectedCamera }) => {
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
-      console.log("devices", devices);
       const videoInputDevices = devices?.filter?.(
         (device) => device.kind === "videoinput" && device.deviceId
       );
@@ -64,7 +63,6 @@ const CameraSelector = ({ setSelectedCamera, selectedCamera }) => {
 
 export const QRScanner = ({ setData, closeScanner }) => {
   const [selectedCamera, setSelectedCamera] = useState(null);
-  console.log("selectedCamera", selectedCamera);
   function xmlToJson(xml) {
     const parser = new DOMParser();
     const xmlElement = parser.parseFromString(xml, "text/xml");
@@ -99,7 +97,6 @@ export const QRScanner = ({ setData, closeScanner }) => {
           onResult={(result, error) => {
             if (!!result) {
               // alert(result?.text);
-              console.log(result?.text);
               setData(JSON.stringify(xmlToJson(result?.text)));
             }
 
@@ -123,10 +120,8 @@ export const QRScanner = ({ setData, closeScanner }) => {
 
 export const ScanAdhar = ({ setData }) => {
   const [deviceId, setDeviceId] = useState(null);
-  console.log("deviceId", deviceId);
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
-      console.log("devices", devices);
       const droidCam =
         devices.find((device) => device.label === "DroidCam Source 3") ||
         devices.find((device) => device.label === "DroidCam Source 2");

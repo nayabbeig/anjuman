@@ -8,7 +8,6 @@ import electionInchargeSignature from "../assets/images/signature.png";
 import AECLogo from "../assets/images/aecLogo.png";
 
 const VoterId = ({ voter }) => {
-  console.log(voter);
   const { data, isLoading } = useGetPanchayatNamesQuery();
   const panchayats = data?.data;
   const getFormattedDate = (dateString) =>

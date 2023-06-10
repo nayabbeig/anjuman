@@ -26,6 +26,7 @@ const VotersForm = ({
   closeScanner,
   isScannerOpen,
   renderCameraSelector,
+  panchayat,
 }) => {
   const { data, isLoading } = useGetPanchayatNamesQuery();
   const initialValues = initialValuesJson && JSON.parse(initialValuesJson);
@@ -40,7 +41,6 @@ const VotersForm = ({
       refetch();
     }
   }, [createResults.isSuccess, updateResults.isSuccess]);
-  //   console.log(panchayats);
 
   const handleClose = () => {
     closeForm();
@@ -48,8 +48,6 @@ const VotersForm = ({
   };
 
   const modalTitle = "Add New Voter";
-
-  //   console.log(panchayat);
 
   const onSubmit = async (values) => {
     const res =
@@ -140,7 +138,7 @@ const VotersForm = ({
           <FinalForm
             onSubmit={onSubmit}
             validate={validate}
-            initialValues={initialValues}
+            initialValues={initialValues || (panchayat && { panchayat })}
             render={({
               handleSubmit,
               reset,
@@ -158,7 +156,6 @@ const VotersForm = ({
               return (
                 <>
                   <Modal.Body>
-                    {/* {console.log("others", others)} */}
                     <Row>
                       <Col>
                         <Form onSubmit={handleSubmit}>
@@ -303,6 +300,7 @@ const VotersForm = ({
                                       checked={
                                         String(input.value) === String(id)
                                       }
+                                      disabled={panchayat}
                                     />
                                   ))}
                                   {isLoading && <Spinner variant="primary" />}
