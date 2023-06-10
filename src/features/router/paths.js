@@ -8,6 +8,8 @@ const path = {
     root: "/",
     voters: "/voters",
     panchayats: "/panchayat",
+    printVoterId: "/printVoterId",
+    settings: "/settings",
   },
   api: {
     auth: {

@@ -7,6 +7,9 @@ import VotersTable from "../components/VotersTable";
 import TablePagination from "../components/Pagination";
 import VotersForm, { Test } from "../components/VotersForm";
 import ScanAdhar, { QRScanner, closeCamera } from "../components/ScanAdhar";
+import onScanSuccess from "../assets/audio/onScanSuccess.mp3";
+import onScanError from "../assets/audio/onScanError.mp3";
+import { useEffect } from "react";
 
 const VotersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,10 +23,12 @@ const VotersPage = () => {
     id: voter.id,
     name: voter.attributes.name,
     father: voter.attributes.father,
+    uid: voter.attributes.uid,
     age: voter.attributes.age,
     updatedAt: voter.attributes.updatedAt,
     panchayatName: voter.attributes?.panchayat?.data?.attributes?.name,
     panchayatId: voter.attributes?.panchayat?.data?.id,
+    pid: voter?.attributes?.panchayat?.data?.attributes?.pid,
     address: voter.attributes.address,
   }));
 
@@ -40,9 +45,32 @@ const VotersPage = () => {
     setShowScanner(false);
   };
 
+  const openScanner = () => {
+    setShowScanner(true);
+  };
+
+  // useEffect(() => {
+  //   const handleKeyPress = (e) => {
+  //     if (e.key === "s") openScanner();
+  //   };
+  //   window.addEventListener("keypress", handleKeyPress);
+
+  //   return () => window.addEventListener("keypress", handleKeyPress);
+  // }, []);
+
+  console.log("audio", new Audio(onScanError));
+
   const handleAdharData = (data) => {
     if (!data) return;
     console.log("scan data from handler", data);
+    if (data === "{}") {
+      const errorAudio = new Audio(onScanError);
+      errorAudio.play();
+    } else {
+      const audioSuccess = new Audio(onScanSuccess);
+      audioSuccess.play();
+      closeScanner();
+    }
     const adharObject = JSON.parse(data);
     const {
       uid,
@@ -98,6 +126,7 @@ const VotersPage = () => {
           isFetching={isFetching}
           currentPage={currentPage}
           pageSize={meta?.pagination?.pageSize}
+          zoom="80%"
         />
       )}
 
@@ -107,7 +136,7 @@ const VotersPage = () => {
           initialValuesJson={adharData}
           isFetching={isFetching}
           closeForm={() => setShowVotersForm(false)}
-          openScanner={() => setShowScanner(true)}
+          openScanner={openScanner}
           closeScanner={closeScanner}
           isScannerOpen={showScanner}
         />
@@ -117,6 +146,7 @@ const VotersPage = () => {
         <div
           style={{
             position: "fixed",
+            top: "100",
             right: "10px",
             bottom: "300px",
             zIndex: 10000,

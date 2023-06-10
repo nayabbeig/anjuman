@@ -41,7 +41,11 @@ function TablePagination({ totalPages, currentPage, setCurrentPage }) {
       {currentPage < 7 && (
         <Pagination className="m-0">
           <Pagination.First onClick={() => setCurrentPage(1)} />
-          <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} />
+          <Pagination.Prev
+            onClick={() =>
+              currentPage - 1 > 0 && setCurrentPage(currentPage - 1)
+            }
+          />
           {new Array(Math.min(totalPages, 6)).fill("_").map((_, index) => (
             <Pagination.Item
               onClick={() => setCurrentPage(index + 1)}
@@ -62,7 +66,11 @@ function TablePagination({ totalPages, currentPage, setCurrentPage }) {
       {currentPage > totalPages - 6 && currentPage > 8 && (
         <Pagination className="m-0">
           <Pagination.First onClick={() => setCurrentPage(1)} />
-          <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} />
+          <Pagination.Prev
+            onClick={() =>
+              currentPage - 1 > 0 && setCurrentPage(currentPage - 1)
+            }
+          />
           <Pagination.Ellipsis />
           {new Array(Math.min(6))
             .fill("_")

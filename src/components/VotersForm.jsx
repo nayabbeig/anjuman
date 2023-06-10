@@ -103,6 +103,13 @@ const VotersForm = ({
     return errors;
   };
 
+  const capitalize = (value) => {
+    return value
+      ?.split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <>
       <Modal show={true} onHide={handleClose} backdrop="static" size="lg">
@@ -160,12 +167,15 @@ const VotersForm = ({
                               <Field
                                 name="name"
                                 validate={(value) => !value && "Required"}
+                                parse={capitalize}
+                                format={capitalize}
                               >
                                 {({ input, meta }) => (
                                   <Form.Group className="mb-3" controlId="name">
                                     <Form.Label>Name</Form.Label>
                                     <Form.Control
                                       {...input}
+                                      autoFocus={true}
                                       type="text"
                                       placeholder="Enter name"
                                       isInvalid={
@@ -221,6 +231,8 @@ const VotersForm = ({
                                   <Form.Group
                                     className="mb-3"
                                     controlId="father"
+                                    parse={capitalize}
+                                    format={capitalize}
                                   >
                                     <Form.Label>Father's Name</Form.Label>
                                     <Form.Control
@@ -301,7 +313,11 @@ const VotersForm = ({
                               </Form.Group>
                             )}
                           </Field>
-                          <Field name="address">
+                          <Field
+                            name="address"
+                            parse={capitalize}
+                            format={capitalize}
+                          >
                             {({ input, meta }) => (
                               <Form.Group className="mb-3" controlId="address">
                                 <Form.Label>Address</Form.Label>
@@ -367,14 +383,14 @@ const VotersForm = ({
                 </Row>
               </Container>
             </Modal.Body>
-            <Modal.Footer>
+            {/* <Modal.Footer>
               <Button variant="secondary" onClick={() => {}}>
                 Print
               </Button>
               <Button variant="primary" onClick={() => setShowForm(true)}>
                 Add New
               </Button>
-            </Modal.Footer>
+            </Modal.Footer> */}
           </>
         )}
       </Modal>

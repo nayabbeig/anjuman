@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import VotersForm from "./VotersForm";
 import DeleteVoterForm from "./deleteVoterModal";
 import { getIdNumber } from "../utils/utls";
-import ScanAdhar from "./ScanAdhar";
+import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
 
 const VotersTableRow = ({
   index,
@@ -12,56 +12,69 @@ const VotersTableRow = ({
   father,
   age,
   panchayatName,
+  uid,
   panchayatId,
+  pid,
   address,
   updatedAt,
   setVoterToBeUpdated,
   setVoterToBeDeleted,
   currentPage,
   pageSize,
+  type,
 }) => {
   return (
     <Row>
-      <Col className="border py-1 tableRow" md={1}>
+      <Col className="border py-1 tableRow" xs={1}>
         {(currentPage - 1) * pageSize + index + 1}
       </Col>
-      <Col className="border py-1 tableRow" md={1}>
-        {getIdNumber({ updatedAt, pid: panchayatId, id })}
-      </Col>
-      <Col className="border py-1 tableRow" md={2}>
+      <Col className="border py-1 tableRow" xs={2}>
         {name}
       </Col>
-      <Col className="border py-1 tableRow" md={2}>
+      <Col className="border py-1 tableRow" xs={2}>
         {father}
       </Col>
-      <Col className="border py-1 tableRow" md={1}>
+      <Col className="border py-1 tableRow" xs={type !== "panchayat" ? 1 : 2}>
+        {getIdNumber({ updatedAt, pid, id })}
+      </Col>
+      <Col className="border py-1 tableRow" xs={1}>
         {age}
       </Col>
-      <Col className="border py-1 tableRow" md={2}>
-        {panchayatName}
-      </Col>
-      <Col className="border py-1 tableRow" md={2}>
+      {type !== "panchayat" && (
+        <Col className="border py-1 tableRow" xs={2}>
+          {panchayatName}
+        </Col>
+      )}
+      <Col className="border py-1 tableRow" xs={type !== "panchayat" ? 2 : 3}>
         {address}
       </Col>
 
-      <Col className="border py-1 tableRow" md={1}>
-        <span
-          className="p-1"
+      <Col
+        className="border py-1 tableRow d-flex justify-content-between"
+        xs={1}
+      >
+        <Button
+          size="sm"
+          className="p-0 px-1 no-print"
+          variant="info"
           onClick={() =>
             setVoterToBeUpdated({
               id,
               name,
               father,
               age,
+              uid,
               panchayat: panchayatId,
               address,
             })
           }
         >
-          Edit
-        </span>
-        <span
-          className="p-1"
+          <BsFillPencilFill />
+        </Button>
+        <Button
+          size="sm"
+          className="p-0 px-1 no-print"
+          variant="danger"
           onClick={() =>
             setVoterToBeDeleted({
               id,
@@ -72,8 +85,8 @@ const VotersTableRow = ({
             })
           }
         >
-          Delete
-        </span>
+          <BsFillTrashFill />
+        </Button>
       </Col>
     </Row>
   );
@@ -85,35 +98,45 @@ const VotersTable = ({
   pageSize,
   refetch,
   isFetching,
+  zoom,
+  type,
 }) => {
   const [voterToBeUpdated, setVoterToBeUpdated] = useState(null);
   const [voterToBeDeleted, setVoterToBeDeleted] = useState(null);
 
   return (
-    <div className="p-3">
+    <div className="p-3" style={{ zoom: zoom || "100%" }}>
       <Row>
-        <Col className="border py-1 tableHeader" md={1}>
+        <Col className="border py-1 tableHeader" xs={1}>
           Sn
         </Col>
-        <Col className="border py-1 tableHeader" md={1}>
-          Id
-        </Col>
-        <Col className="border py-1 tableHeader" md={2}>
+        <Col className="border py-1 tableHeader" xs={2}>
           Name
         </Col>
-        <Col className="border py-1 tableHeader" md={2}>
+        <Col className="border py-1 tableHeader" xs={2}>
           Father's Name
         </Col>
-        <Col className="border py-1 tableHeader" md={1}>
+        <Col
+          className="border py-1 tableHeader"
+          xs={type !== "panchayat" ? 1 : 2}
+        >
+          Id
+        </Col>
+        <Col className="border py-1 tableHeader" xs={1}>
           Age
         </Col>
-        <Col className="border py-1 tableHeader" md={2}>
-          Panchayat
-        </Col>
-        <Col className="border py-1 tableHeader" md={2}>
+        {type !== "panchayat" && (
+          <Col className="border py-1 tableHeader" xs={2}>
+            Panchayat
+          </Col>
+        )}
+        <Col
+          className="border py-1 tableHeader"
+          xs={type !== "panchayat" ? 2 : 3}
+        >
           Address
         </Col>
-        <Col className="border py-1 tableHeader" md={1}></Col>
+        <Col className="border py-1 tableHeader" xs={1}></Col>
       </Row>
       {voters.map((voter, index) => (
         <VotersTableRow
@@ -123,12 +146,13 @@ const VotersTable = ({
           setVoterToBeDeleted={setVoterToBeDeleted}
           currentPage={currentPage}
           pageSize={pageSize}
+          type={type}
         />
       ))}
 
       {voterToBeUpdated && (
         <VotersForm
-          initialValues={voterToBeUpdated}
+          initialValuesJson={JSON.stringify(voterToBeUpdated)}
           refetch={refetch}
           isFetching={isFetching}
           closeForm={() => setVoterToBeUpdated(null)}
@@ -139,6 +163,7 @@ const VotersTable = ({
         <DeleteVoterForm
           voter={voterToBeDeleted}
           closeForm={() => setVoterToBeDeleted(null)}
+          refetch={refetch}
         />
       )}
     </div>

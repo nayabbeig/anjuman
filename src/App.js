@@ -6,6 +6,8 @@ import PanchayatsPage from "./pages/Panchayats.page";
 
 import "./App.css";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
+import Settings from "./pages/Settings.page";
+import PrintVoterIdPage from "./pages/PrintVoterId.page";
 
 export default function App() {
   return (
@@ -19,6 +21,12 @@ export default function App() {
           </Route>
           <Route path={path.ui.panchayats}>
             <PanchayatsPage />
+          </Route>
+          <Route path={path.ui.printVoterId}>
+            <PrintVoterIdPage />
+          </Route>
+          <Route path={path.ui.settings}>
+            <Settings />
           </Route>
           <Route path={path.ui.root}>
             <Redirect to={path.ui.voters} />

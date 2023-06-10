@@ -4,7 +4,7 @@ import { useHistory, Link } from "react-router-dom";
 
 function NavBar() {
   const history = useHistory();
-  const { panchayats, voters } = path.ui;
+  const { panchayats, printVoterId, voters, settings } = path.ui;
   return (
     <Nav className="no-print" variant="tabs">
       <Nav.Item>
@@ -23,6 +23,24 @@ function NavBar() {
           Panchayats
         </Nav.Link>
       </Nav.Item>
+
+      <Nav.Item>
+        <Nav.Link
+          onClick={() => history.push(printVoterId)}
+          active={printVoterId === history.location.pathname}
+        >
+          Print Voter Id
+        </Nav.Link>
+      </Nav.Item>
+
+      {/* <Nav.Item>
+        <Nav.Link
+          onClick={() => history.push(settings)}
+          active={settings === history.location.pathname}
+        >
+          Settings
+        </Nav.Link>
+      </Nav.Item> */}
     </Nav>
   );
 }

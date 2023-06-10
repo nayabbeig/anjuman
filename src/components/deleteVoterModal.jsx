@@ -5,8 +5,7 @@ import { useDeleteVoterMutation, useGetVotersQuery } from "../api/votersApi";
 import { Alert, Col, Container, Row, Spinner } from "react-bootstrap";
 import { useGetPanchayatNamesQuery } from "../api/panchayatsApi";
 
-function DeleteVoterForm({ closeForm, voter }) {
-  const { refetch, isFetching } = useGetVotersQuery();
+function DeleteVoterForm({ closeForm, voter, refetch }) {
   const { data, isLoading: isPanchayatLoading } = useGetPanchayatNamesQuery();
   const panchayats = data?.data;
   const [deleteVoter, result] = useDeleteVoterMutation();

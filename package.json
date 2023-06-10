@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "main.js",
-  "homepage": ".",
+  "homepage": "./",
   "dependencies": {
     "@ionic/react": "^7.0.1",
     "@ionic/react-router": "^7.0.1",

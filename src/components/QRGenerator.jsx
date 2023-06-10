@@ -11,16 +11,16 @@ const QRGenerator = ({ value, size, imageSize, noImage }) => {
       fgColor={"#000000"}
       level={"L"}
       includeMargin={false}
-      imageSettings={
-        !noImage && {
-          src: MoonStar,
-          x: undefined,
-          y: undefined,
-          height: imageSize || 24,
-          width: imageSize || 24,
-          excavate: true,
-        }
-      }
+      // imageSettings={
+      //   !noImage && {
+      //     src: MoonStar,
+      //     x: undefined,
+      //     y: undefined,
+      //     height: imageSize || 24,
+      //     width: imageSize || 24,
+      //     excavate: true,
+      //   }
+      // }
     />
   );
 };

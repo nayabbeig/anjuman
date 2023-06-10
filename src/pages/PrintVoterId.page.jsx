@@ -8,9 +8,8 @@ import { useGetVotersByPanchayatQuery } from "../api/votersApi";
 import VoterId from "../components/VoterId";
 import SearchBar from "../components/SearchBar";
 import { useLayoutEffect } from "react";
-import VotersTable from "../components/VotersTable";
 
-const PanchayatsPage = () => {
+const PrintVoterIdPage = () => {
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading } = useGetPanchayatsQuery();
@@ -34,19 +33,8 @@ const PanchayatsPage = () => {
     name: keyword,
     uid: keyword,
     page: currentPage,
+    pageSize: 9,
   });
-
-  const useWrappedQuery = ({ panchayat, keyword }) => {
-    const {
-      data: votersData,
-      isLoading: isVotersLoading,
-      refetch,
-    } = useGetVotersByPanchayatQuery({
-      panchayat,
-      name: keyword,
-      uid: keyword,
-    });
-  };
 
   const {
     data: votersData,
@@ -62,16 +50,12 @@ const PanchayatsPage = () => {
   const { data: votersList, meta } = votersData || {};
 
   const votersListFormatted = votersList?.map?.((voter, index) => ({
-    id: voter.id,
-    name: voter.attributes.name,
-    father: voter.attributes.father,
-    uid: voter.attributes.uid,
-    age: voter.attributes.age,
-    updatedAt: voter.attributes.updatedAt,
-    panchayatName: voter.attributes?.panchayat?.data?.attributes?.name,
-    panchayatId: voter.attributes?.panchayat?.data?.id,
     pid: voter?.attributes?.panchayat?.data?.attributes?.pid,
-    address: voter.attributes.address,
+    id: voter?.id,
+    uid: voter?.uid,
+    ...voter.attributes,
+    panchayat: voter?.attributes?.panchayat?.data?.id,
+    panchayatName: voter?.attributes?.panchayat?.data?.attributes?.name,
   }));
 
   // const voters = [];
@@ -87,6 +71,18 @@ const PanchayatsPage = () => {
   const pagination = meta?.pagination;
 
   const shouldLoaderDisplay = isLoading || isVotersLoading || isVotersFetching;
+
+  const useWrappedQuery = ({ panchayat, keyword }) => {
+    const {
+      data: votersData,
+      isLoading: isVotersLoading,
+      refetch,
+    } = useGetVotersByPanchayatQuery({
+      panchayat,
+      name: keyword,
+      uid: keyword,
+    });
+  };
 
   return (
     <Container fluid className="px-2">
@@ -149,21 +145,25 @@ const PanchayatsPage = () => {
           </Row>
         </div>
       )}
-
-      {isLoading && <Loader />}
-      {votersListFormatted && (
-        <VotersTable
-          voters={votersListFormatted}
-          refetch={refetch}
-          isFetching={isVotersFetching}
-          currentPage={currentPage}
-          pageSize={meta?.pagination?.pageSize}
-          type="panchayat"
-          zoom="70%"
-        />
-      )}
+      <div className="d-flex justify-content-center">
+        <div
+          className="d-flex flex-column border print p-0"
+          style={{ height: "29.7cm", width: "21cm", zoom: "88%" }}
+        >
+          <p className="m-0 p-0 w-100">Page: {currentPage}</p>
+          <div className="d-flex flex-wrap print p-0 m-0">
+            {shouldLoaderDisplay ? (
+              <Loader />
+            ) : (
+              votersListFormatted?.map(
+                (voter, index) => voter && <VoterId voter={voter} />
+              )
+            )}
+          </div>
+        </div>
+      </div>
     </Container>
   );
 };
 
-export default PanchayatsPage;
+export default PrintVoterIdPage;
