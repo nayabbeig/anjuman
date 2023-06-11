@@ -223,7 +223,11 @@ const VotersForm = ({
                           </Row>
                           <Row>
                             <Col>
-                              <Field name="father">
+                              <Field
+                                name="father"
+                                parse={capitalize}
+                                format={capitalize}
+                              >
                                 {({ input, meta }) => (
                                   <Form.Group
                                     className="mb-3"

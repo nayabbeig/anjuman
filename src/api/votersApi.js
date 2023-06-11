@@ -11,13 +11,13 @@ export const votersApi = createApi({
   endpoints(builder) {
     return {
       getVoters: builder.query({
-        query: ({ page = 1, pageSize = 15 } = {}) => ({
+        query: ({ page = 1, pageSize = 22 } = {}) => ({
           url: `?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
           method: "get",
         }),
       }),
       getVotersByPanchayat: builder.query({
-        query: ({ page = 1, pageSize = 15, panchayat, name, uid } = {}) => {
+        query: ({ page = 1, pageSize = 22, panchayat, name, uid } = {}) => {
           return (
             panchayat && {
               url: `?filters[panchayat]=${panchayat}${
