@@ -34,18 +34,25 @@ const VotersTableRow = ({
       <Col className="border py-1 tableRow" xs={2}>
         {father}
       </Col>
-      <Col className="border py-1 tableRow" xs={type !== "panchayat" ? 1 : 2}>
+      <Col
+        className="border py-1 tableRow"
+        xs={type !== "panchayat" ? 2 : 3}
+        lg={type !== "panchayat" ? 1 : 2}
+      >
         {getIdNumber({ updatedAt, pid, id })}
       </Col>
       <Col className="border py-1 tableRow" xs={1}>
         {age}
       </Col>
       {type !== "panchayat" && (
-        <Col className="border py-1 tableRow" xs={2}>
+        <Col className="border py-1 tableRow" xs={3} lg={2}>
           {panchayatName}
         </Col>
       )}
-      <Col className="border py-1 tableRow" xs={type !== "panchayat" ? 2 : 3}>
+      <Col
+        className="border py-1 tableRow  d-none d-lg-block"
+        xs={type !== "panchayat" ? 2 : 3}
+      >
         {address}
       </Col>
 
@@ -119,7 +126,8 @@ const VotersTable = ({
         </Col>
         <Col
           className="border py-1 tableHeader"
-          xs={type !== "panchayat" ? 1 : 2}
+          xs={type !== "panchayat" ? 2 : 3}
+          lg={type !== "panchayat" ? 1 : 2}
         >
           Id
         </Col>
@@ -127,12 +135,12 @@ const VotersTable = ({
           Age
         </Col>
         {type !== "panchayat" && (
-          <Col className="border py-1 tableHeader" xs={2}>
+          <Col className="border py-1 tableHeader" xs={3} lg={2}>
             Panchayat
           </Col>
         )}
         <Col
-          className="border py-1 tableHeader"
+          className="border py-1 tableHeader d-none d-lg-block"
           xs={type !== "panchayat" ? 2 : 3}
         >
           Address

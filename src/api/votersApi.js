@@ -30,6 +30,20 @@ export const votersApi = createApi({
           );
         },
       }),
+      getVotersByElection: builder.query({
+        query: ({ page = 1, pageSize = 15, election, name, uid } = {}) => {
+          return (
+            election && {
+              url: `?filters[election]=${election}${
+                name ? `&filters[$or][0][name][$contains]=${name}` : ""
+              }${
+                uid ? `&filters[$or][1][uid][$contains]=${uid}` : ""
+              }&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`,
+              method: "get",
+            }
+          );
+        },
+      }),
       createVoter: builder.mutation({
         query: (data) => {
           return { url: "/", method: "post", data };
@@ -52,6 +66,7 @@ export const votersApi = createApi({
 export const {
   useGetVotersQuery,
   useGetVotersByPanchayatQuery,
+  useGetVotersByElectionQuery,
   useCreateVoterMutation,
   useUpdateVoterMutation,
   useDeleteVoterMutation,
