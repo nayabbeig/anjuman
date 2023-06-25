@@ -1,4 +1,4 @@
-import React, { useState, memo, useEffect } from "react";
+import React, { useState, memo, useEffect, useRef } from "react";
 import { Alert, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -15,6 +15,7 @@ import { getIdNumber } from "../utils/utls";
 import VoterId from "./VoterId";
 import { BsQrCodeScan } from "react-icons/bs";
 import ScanAdhar from "./ScanAdhar";
+import { ImageUpload } from "./HybridInput";
 
 const VotersForm = ({
   closeForm,
@@ -35,6 +36,9 @@ const VotersForm = ({
   const [updateVoter, updateResults] = useUpdateVoterMutation();
   const [showForm, setShowForm] = useState(true);
   const [lastSubmittedData, setLastSubmittedData] = useState(null);
+
+  console.log("intialValues", initialValues);
+
   useEffect(() => {
     if (createResults.isSuccess || updateResults.isSuccess) {
       setShowForm(false);
@@ -50,6 +54,7 @@ const VotersForm = ({
   const modalTitle = "Add New Voter";
 
   const onSubmit = async (values) => {
+    console.log("values", values);
     const res =
       initialValues && !openScanner
         ? await updateVoter({ data: { ...values }, id: initialValues.id })
@@ -65,14 +70,17 @@ const VotersForm = ({
         return errorObject;
       }
     }
-    if (res.data.data)
+    if (res.data.data) {
+      console.log("result", res.data.data);
       setLastSubmittedData({
         panchayat: values.panchayat,
+        photo: values.photo,
         pid: panchayats.find((p) => String(p.id) === String(values.panchayat))
           ?.pid,
         id: res.data.data.id,
         ...res.data.data.attributes,
       });
+    }
   };
   const validate = (values) => {
     const errors = {};
@@ -107,6 +115,11 @@ const VotersForm = ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
+
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const imageInputRef = useRef(null);
+
+  console.log("imageinputref", imageInputRef);
 
   return (
     <>
@@ -276,45 +289,76 @@ const VotersForm = ({
                               </Field>
                             </Col>
                           </Row>
-                          <Field name="panchayat">
-                            {({ input, meta }) => (
-                              <Form.Group
-                                className="mb-3"
-                                controlId="panchayat"
+                          <Row>
+                            <Col>
+                              <Field name="panchayat">
+                                {({ input, meta }) => (
+                                  <Form.Group
+                                    className="mb-3"
+                                    controlId="panchayat"
+                                  >
+                                    <Form.Label>Panchayat</Form.Label>
+                                    <div key="inline-radio" className="mb-3">
+                                      {panchayats?.map?.(({ name, id }) => (
+                                        <Form.Check
+                                          {...input}
+                                          type="radio"
+                                          label={name}
+                                          id={id}
+                                          value={id}
+                                          name="panchayat"
+                                          isInvalid={
+                                            (meta.dirty || submitFailed) &&
+                                            meta.error
+                                          }
+                                          isValid={
+                                            meta.dirty &&
+                                            !meta.error &&
+                                            input.value === String(id)
+                                          }
+                                          checked={
+                                            String(input.value) === String(id)
+                                          }
+                                          disabled={panchayat}
+                                        />
+                                      ))}
+                                      {isLoading && (
+                                        <Spinner variant="primary" />
+                                      )}
+                                    </div>
+                                    <Form.Control.Feedback type="invalid">
+                                      {meta.error}
+                                    </Form.Control.Feedback>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                            <Col>
+                              <Field
+                                name="photo"
+                                // parse={capitalize}
+                                // format={capitalize}
                               >
-                                <Form.Label>Panchayat</Form.Label>
-                                <div key="inline-radio" className="mb-3">
-                                  {panchayats?.map?.(({ name, id }) => (
-                                    <Form.Check
-                                      {...input}
-                                      type="radio"
-                                      label={name}
-                                      id={id}
-                                      value={id}
-                                      name="panchayat"
-                                      isInvalid={
-                                        (meta.dirty || submitFailed) &&
-                                        meta.error
-                                      }
-                                      isValid={
-                                        meta.dirty &&
-                                        !meta.error &&
-                                        input.value === String(id)
-                                      }
-                                      checked={
-                                        String(input.value) === String(id)
-                                      }
-                                      disabled={panchayat}
+                                {({ input, meta }) => (
+                                  <Form.Group
+                                    className="mb-3"
+                                    controlId="address"
+                                  >
+                                    <Form.Label>Photo</Form.Label>
+
+                                    <ImageUpload
+                                      disableGallery
+                                      close={setShowImageUpload}
+                                      formInput={input}
+                                      meta={meta}
+                                      defaultImage={initialValues?.defaultImage}
                                     />
-                                  ))}
-                                  {isLoading && <Spinner variant="primary" />}
-                                </div>
-                                <Form.Control.Feedback type="invalid">
-                                  {meta.error}
-                                </Form.Control.Feedback>
-                              </Form.Group>
-                            )}
-                          </Field>
+                                  </Form.Group>
+                                )}
+                              </Field>
+                            </Col>
+                          </Row>
+
                           <Field
                             name="address"
                             parse={capitalize}

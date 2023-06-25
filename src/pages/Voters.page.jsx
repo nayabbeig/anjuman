@@ -10,6 +10,7 @@ import ScanAdhar, { QRScanner, closeCamera } from "../components/ScanAdhar";
 import onScanSuccess from "../assets/audio/onScanSuccess.mp3";
 import onScanError from "../assets/audio/onScanError.mp3";
 import { useEffect } from "react";
+import { ImageUpload } from "../components/HybridInput";
 
 const VotersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +30,7 @@ const VotersPage = () => {
     panchayatName: voter.attributes?.panchayat?.data?.attributes?.name,
     panchayatId: voter.attributes?.panchayat?.data?.id,
     pid: voter?.attributes?.panchayat?.data?.attributes?.pid,
+    photo: voter?.attributes?.photo,
     address: voter.attributes.address,
   }));
 
@@ -101,6 +103,17 @@ const VotersPage = () => {
       <Row className="mt-2">
         <Col>
           <h2>Voters</h2>
+        </Col>
+        <Col>
+          {/* <div
+            style={{
+              border: "2px solid black",
+              height: "100px",
+              width: "300px",
+            }}
+          >
+            <ImageUpload />
+          </div> */}
         </Col>
         <Col>
           {pagination && voters && (

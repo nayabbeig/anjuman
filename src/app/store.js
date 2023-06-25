@@ -4,6 +4,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { votersApi } from "../api/votersApi";
 import { panchayatsApi } from "../api/panchayatsApi";
 import { electionsApi } from "../api/electionsApi";
+import galleryReducer from "../components/GallerySlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     [votersApi.reducerPath]: votersApi.reducer,
     [panchayatsApi.reducerPath]: panchayatsApi.reducer,
     [electionsApi.reducerPath]: electionsApi.reducer,
+    gallery: galleryReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.

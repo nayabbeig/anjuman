@@ -6,7 +6,7 @@ const QRGenerator = ({ value, size, imageSize, noImage }) => {
   return (
     <QRCodeSVG
       value={value}
-      size={size || 100}
+      size={size || 130}
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"L"}

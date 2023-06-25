@@ -8,6 +8,7 @@ import "./App.css";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import Settings from "./pages/Settings.page";
 import PrintVoterIdPage from "./pages/PrintVoterId.page";
+import ImageGalleryPage from "./pages/Gallery.page";
 
 export default function App() {
   return (
@@ -25,9 +26,12 @@ export default function App() {
           <Route path={path.ui.printVoterId}>
             <PrintVoterIdPage />
           </Route>
+          {/* <Route path={path.ui.imageGallery}>
+            <ImageGalleryPage />
+          </Route>
           <Route path={path.ui.settings}>
             <Settings />
-          </Route>
+          </Route> */}
           <Route path={path.ui.root}>
             <Redirect to={path.ui.voters} />
           </Route>

@@ -227,6 +227,9 @@ const PanchayatsPage = () => {
           currentPage={currentPage}
           pageSize={meta?.pagination?.pageSize}
           panchayat={selectedPanchayat}
+          panchayatName={
+            panchayats?.find((p) => p?.id === selectedPanchayat)?.name
+          }
           type="panchayat"
           zoom="80%"
         />

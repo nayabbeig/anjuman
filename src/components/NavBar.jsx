@@ -4,7 +4,7 @@ import { useHistory, Link } from "react-router-dom";
 
 function NavBar() {
   const history = useHistory();
-  const { panchayats, printVoterId, voters, settings } = path.ui;
+  const { panchayats, printVoterId, voters, imageGallery, settings } = path.ui;
   return (
     <Nav className="no-print" variant="tabs">
       <Nav.Item>
@@ -32,6 +32,15 @@ function NavBar() {
           Print Voter Id
         </Nav.Link>
       </Nav.Item>
+
+      {/* <Nav.Item>
+        <Nav.Link
+          onClick={() => history.push(imageGallery)}
+          active={imageGallery === history.location.pathname}
+        >
+          Image Gallery
+        </Nav.Link>
+      </Nav.Item> */}
 
       {/* <Nav.Item>
         <Nav.Link

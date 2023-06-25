@@ -4,6 +4,7 @@ import VotersForm from "./VotersForm";
 import DeleteVoterForm from "./deleteVoterModal";
 import { getIdNumber } from "../utils/utls";
 import { BsFillPencilFill, BsFillTrashFill } from "react-icons/bs";
+import path from "../features/router/paths";
 
 const VotersTableRow = ({
   index,
@@ -15,6 +16,7 @@ const VotersTableRow = ({
   uid,
   panchayatId,
   pid,
+  photo,
   address,
   updatedAt,
   setVoterToBeUpdated,
@@ -34,25 +36,18 @@ const VotersTableRow = ({
       <Col className="border py-1 tableRow" xs={2}>
         {father}
       </Col>
-      <Col
-        className="border py-1 tableRow"
-        xs={type !== "panchayat" ? 2 : 3}
-        lg={type !== "panchayat" ? 1 : 2}
-      >
+      <Col className="border py-1 tableRow" xs={type !== "panchayat" ? 1 : 2}>
         {getIdNumber({ updatedAt, pid, id })}
       </Col>
       <Col className="border py-1 tableRow" xs={1}>
         {age}
       </Col>
       {type !== "panchayat" && (
-        <Col className="border py-1 tableRow" xs={3} lg={2}>
+        <Col className="border py-1 tableRow" xs={2}>
           {panchayatName}
         </Col>
       )}
-      <Col
-        className="border py-1 tableRow  d-none d-lg-block"
-        xs={type !== "panchayat" ? 2 : 3}
-      >
+      <Col className="border py-1 tableRow " xs={type !== "panchayat" ? 2 : 3}>
         {address}
       </Col>
 
@@ -73,6 +68,11 @@ const VotersTableRow = ({
               uid,
               panchayat: panchayatId,
               address,
+              photo: photo?.data?.id,
+              defaultImage: {
+                url: photo?.data?.attributes?.url,
+                id: photo?.data?.id,
+              },
             })
           }
         >
@@ -108,12 +108,18 @@ const VotersTable = ({
   panchayat,
   zoom,
   type,
+  panchayatName,
 }) => {
   const [voterToBeUpdated, setVoterToBeUpdated] = useState(null);
   const [voterToBeDeleted, setVoterToBeDeleted] = useState(null);
 
   return (
     <div className="p-3" style={{ zoom: zoom || "100%" }}>
+      {type === "panchayat" && (
+        <Row>
+          <h1 className="px-0 mb-3">{panchayatName}</h1>
+        </Row>
+      )}
       <Row>
         <Col className="border py-1 tableHeader" xs={1}>
           Sn
@@ -126,8 +132,7 @@ const VotersTable = ({
         </Col>
         <Col
           className="border py-1 tableHeader"
-          xs={type !== "panchayat" ? 2 : 3}
-          lg={type !== "panchayat" ? 1 : 2}
+          xs={type !== "panchayat" ? 1 : 2}
         >
           Id
         </Col>
@@ -135,12 +140,12 @@ const VotersTable = ({
           Age
         </Col>
         {type !== "panchayat" && (
-          <Col className="border py-1 tableHeader" xs={3} lg={2}>
+          <Col className="border py-1 tableHeader" xs={2}>
             Panchayat
           </Col>
         )}
         <Col
-          className="border py-1 tableHeader d-none d-lg-block"
+          className="border py-1 tableHeader"
           xs={type !== "panchayat" ? 2 : 3}
         >
           Address

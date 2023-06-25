@@ -6,10 +6,14 @@ import { useGetPanchayatNamesQuery } from "../api/panchayatsApi";
 
 import electionInchargeSignature from "../assets/images/signature.png";
 import AECLogo from "../assets/images/aecLogo.png";
+import path from "../features/router/paths";
 
 const VoterId = ({ voter }) => {
+  console.log("voter", voter);
   const { data, isLoading } = useGetPanchayatNamesQuery();
   const panchayats = data?.data;
+  const photoUrl = voter?.photo?.data?.attributes?.url;
+  const { photo, ...qrData } = voter;
   const getFormattedDate = (dateString) =>
     moment(new Date(dateString)).format("DD-MMM-YYYY");
   return (
@@ -33,16 +37,25 @@ const VoterId = ({ voter }) => {
         <Row className="mb-3">
           <Col>
             <div
-              style={{ width: "100px", height: "120px" }}
+              style={{ width: "120px", height: "150px", overflow: "hidden" }}
               className="border d-flex justify-content-center align-items-center"
             >
-              Photo
+              {photoUrl ? (
+                <img
+                  height="100%"
+                  width="auto"
+                  src={path.hostOnly + photoUrl}
+                  alt="Photo"
+                />
+              ) : (
+                "Photo"
+              )}
             </div>
           </Col>
           <Col>
             <QRGenerator
               value={JSON.stringify({
-                ...voter,
+                ...qrData,
                 IDN: getIdNumber(voter),
               })}
             />
